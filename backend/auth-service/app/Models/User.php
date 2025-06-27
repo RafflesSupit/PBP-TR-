@@ -6,12 +6,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
+
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     /**
      * The attributes that are mass assignable.
@@ -84,6 +88,15 @@ class User extends Authenticatable implements JWTSubject
     public function hasRole($role)
     {
         return $this->role === $role;
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($user) {
+            if (empty($user->id)) {
+                $user->id = Str::uuid()->toString();
+            }
+        });
     }
     
 }
