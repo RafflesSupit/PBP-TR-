@@ -31,7 +31,7 @@ class CommentController extends Controller
             'content' => 'required|string',
         ]);
 
-        $newsCheck = Http::get(env('NEWS_SERVICE_URL') . "news/{$request->news_id}");
+        $newsCheck = Http::get(env('NEWS_SERVICE_URL') . '/news/' . $request->news_id);
         if (!$newsCheck->ok()) {
             return response()->json(['message' => 'Invalid news ID'], 400);
         }

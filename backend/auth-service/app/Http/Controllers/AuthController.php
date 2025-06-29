@@ -100,7 +100,7 @@ class AuthController extends Controller
 
     public function logout(){
         auth()->logout();
-    
+        
 
         return response()->json([
             'success' => true,

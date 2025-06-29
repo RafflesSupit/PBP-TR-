@@ -13,10 +13,43 @@ class NewsController extends Controller
         return News::orderBy('created_at', 'desc')->get();
     }
 
+    public function indexByUser(Request $request)
+    {
+        $user = $request->auth_user;
+        if(!$user){
+            return response()->json([
+                'data' => "error"
+            ],401);
+        }
+        $news = News::where('user_id', $user['id'])->orderBy('created_at', 'desc')->get();
+        return response()->json($news);
+    }
+
+    public function countNews(){
+        $countNews = News::where('status', 'published')->count();
+        return response()->json([
+            'success' => true,
+            'data' => $countNews,
+        ]);
+    }
+    public function trendingNews(){
+        $trendingNews = News::where('status', 'published')->orderBy('views', 'desc')->take(1)->get();
+        return response()->json([
+            'success' => true,
+            'data' => $trendingNews,
+        ]);
+    }
+
     public function show($id)
     {
         $news = News::findOrFail($id);
         $news->increment('views');
+        return response()->json($news);
+    }
+
+    public function edit($id)
+    {
+        $news = News::findOrFail($id);
         return response()->json($news);
     }
 
@@ -28,7 +61,7 @@ class NewsController extends Controller
             'content' => 'required|string',
             'category_id' => 'required|uuid',
             'thumbnail_url' => 'nullable|string',
-            'status' => 'in:draft,published'
+            'status' => 'nullable|in:draft,published'
         ]);
 
         // Validasi kategori ke Category Service
@@ -36,6 +69,8 @@ class NewsController extends Controller
         if ($res->failed()) {
             return response()->json(['message' => 'Invalid Category'], 400);
         }
+
+        $validated['status'] = $validated['status'] ?? 'draft';
 
         $validated['user_id'] = $user['id'];
         if ($validated['status'] === 'published') {
@@ -59,7 +94,7 @@ class NewsController extends Controller
             'title' => 'string',
             'content' => 'string',
             'category_id' => 'uuid',
-            'thumbnail_url' => 'string',
+            'thumbnail_url' => 'nullable|string',
             'status' => 'in:draft,published'
         ]);
 
@@ -70,6 +105,7 @@ class NewsController extends Controller
             }
         }
 
+        
         if ($validated['status'] === 'published' && !$news->published_at) {
             $validated['published_at'] = now();
         }

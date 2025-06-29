@@ -31,6 +31,15 @@ class UserController extends Controller
         ]);
     }
 
+    public function countUsers(){
+        $usersCount = User::count();
+
+        return response()->json([
+            'success' => true,
+            'data' => $usersCount,
+        ]);
+    }
+
     /**
      * Show the form for creating a new resource.
      */

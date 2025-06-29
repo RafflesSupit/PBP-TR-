@@ -12,7 +12,7 @@ Route::middleware(['api'])->group(function(){
     Route::post('logout',[AuthController::class, 'logout']);
     Route::post('refresh',[AuthController::class, 'refresh']);
     Route::get('me', [AuthController::class, 'me']);
+    Route::get('countUser', [UserController::class,'countUsers']);
 });
-
 
 Route::apiResource('users', UserController::class);
